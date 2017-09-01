@@ -2,11 +2,17 @@ package fdi.maps.client;
 
 import java.util.LinkedList;
 
+import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.geolocation.client.Geolocation;
+import com.google.gwt.geolocation.client.Position;
+import com.google.gwt.geolocation.client.PositionError;
+import com.google.gwt.geolocation.client.Position.Coordinates;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -38,206 +44,248 @@ public class GMapsEJ implements EntryPoint {
 	LinkedList<Marker> listaMarked;
 	private Geocoder fCoder;
 	private GoogleMap gMap;
+	private Marker ActualMarked;
+	
+	private String PUNTO_NO_SETEADO="Point not seted yet, click on map to set the position";
 
 	public void onModuleLoad() {
-		listaMarked=new LinkedList<>();
-		FormPanel panel = new FormPanel();
-        panel.setWidth("100%");
-        panel.setHeight("600px");
-        MapOptions options = MapOptions.create();
-        options.setCenter(LatLng.create(40.4169,-3.7033));
-        options.setZoom(13);
-        options.setMapTypeId(MapTypeId.ROADMAP);
-        options.setDraggable(true);
-        options.setMapTypeControl(true);
-        options.setScaleControl(true);
-        options.setScrollwheel(true);
-        options.setMapMaker(true);
-//        Button btn = new Button();
-        gMap = GoogleMap.create(panel.getElement(), options);
-        RootPanel.get("centered").add(panel);
-//        RootPanel.get("centered").add(btn);
-
-        gMap.addDblClickListener(new DblClickHandler() {
-			
-        	
-        	
-
-			@Override
-			public void handle(MouseEvent event) {
-//				Window.alert(event.getLatLng().toString());
-//		        MarkerImage markerImage = MarkerImage.create();
-				
-				GeocoderRequest GReq = GeocoderRequest.create();
-				GReq.setLocation(event.getLatLng());
-				fCoder.geocode(GReq, new Geocoder.Callback() {
-					
-					
-					
-					private Marker marker;
-					private int Position;
-
-					@Override
-					public void handle(JsArray<GeocoderResult> a, GeocoderStatus b) {
-						GeocoderResult result = a.shift();
-//						Window.alert(result.getFormattedAddress());
-						 MarkerOptions mOpts = MarkerOptions.create();
-//					        mOpts.setIcon(markerImage);
-					        mOpts.setPosition(result.getGeometry().getLocation());
-					        
-					        marker = Marker.create(mOpts);
-					        marker.setTitle(result.getFormattedAddress());
-					        marker.setMap(gMap);
-					        
-					        listaMarked.add(marker);
-					        L.addItem(result.getFormattedAddress());
-					        Position=L.getItemCount()-1;
-					        marker.addDblClickListener(new Marker.DblClickHandler() {
-								
-								@Override
-								public void handle(MouseEvent event) {
-									
-									BorrarPunto(marker,Position);
-
-								}
-							});
-					}
-				});
-				
-				
-		       
-				
-			}
-		});
-        
-        LatLng centerIcon = LatLng.create(40.4169,-3.7033);
-//        MarkerImage markerImage = MarkerImage.create();
-        MarkerOptions mOpts = MarkerOptions.create();
-//        mOpts.setIcon(markerImage);
-        mOpts.setPosition(centerIcon);
-        
-        Marker marker = Marker.create(mOpts);
-        marker.setMap(gMap);
-        
-//        gMap.addIdleListener(new GoogleMap.IdleHandler() {
-//
-//            public void handle() {
-//                Window.alert("Idle");
-//
-//            }
-//        });
-        fCoder = Geocoder.create();
-        L=new ListBox();
-        L.setVisibleItemCount(5);
-        L.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				int Selecctioado = L.getSelectedIndex()-1;
-				if (!listaMarked.isEmpty())
-					{
-					
-					Marker Marked=listaMarked.get(Selecctioado);
-					BorrarPunto(Marked,Selecctioado);
-					}
-				
-			}
-		});
-        
-        
-        
-        
-        
-        
-        
-        RootPanel.get("centered").add(L);
-        
-        
-        FormPanel panel2 = new FormPanel();
-        panel2.setWidth("100%");
-        panel2.setHeight("600px");
-        MapOptions options3 = MapOptions.create();
-        options3.setCenter(LatLng.create(40.4169,-3.7033));
-        options3.setZoom(13);
-        options3.setMapTypeId(MapTypeId.ROADMAP);
-        options3.setDraggable(true);
-        options3.setMapTypeControl(true);
-        options3.setScaleControl(true);
-        options3.setScrollwheel(true);
-        options3.setMapMaker(true);
-//        Button btn = new Button();
-        GoogleMap gMap2 = GoogleMap.create(panel2.getElement(), options3);
-        RootPanel.get("centered").add(panel2);
-//      
-        
-        
-        
-        DirectionsRendererOptions options2 = DirectionsRendererOptions.create();
-        final DirectionsRenderer directionsDisplay = DirectionsRenderer.create(options2);
-        directionsDisplay.setMap(gMap2);
-        
-        DirectionsRequest DR = DirectionsRequest.create();
-        DR.setOrigin(LatLng.create(40.4169,-3.7033));
-        DR.setDestination(LatLng.create(37.8550964,-4.7086738));
-        DR.setTravelMode(TravelMode.WALKING);
-        
-        DirectionsWaypoint DW=DirectionsWaypoint.create();
-        
-        DW.setLocation(LatLng.create(39.8676536,-4.0098788));
-        DW.setStopover(true);
-
-        DirectionsWaypoint DW2=DirectionsWaypoint.create();
-        
-        DW2.setLocation(LatLng.create(38.9554156,-3.9809874));
-        DW2.setStopover(true);
-        
-        JsArray<DirectionsWaypoint> waypoints = JsArray.createArray().cast();
-        waypoints.push(DW);
-        waypoints.push(DW2);
-        
-        
-        DR.setWaypoints(waypoints);
-        
-        DirectionsService DS=DirectionsService.create();
-        
-        DS.route(DR, new DirectionsService.Callback() {
-			
-			@Override
-			public void handle(DirectionsResult result, DirectionsStatus status) {
-				if (status == DirectionsStatus.OK) {
-			          directionsDisplay.setDirections(result);
-			        } else if (status == DirectionsStatus.INVALID_REQUEST) {
-			        	Window.alert(status.toString());
-			        } else if (status == DirectionsStatus.MAX_WAYPOINTS_EXCEEDED) {
-			        	Window.alert(status.toString());
-			        } else if (status == DirectionsStatus.NOT_FOUND) {
-			        	Window.alert(status.toString());
-			        } else if (status == DirectionsStatus.OVER_QUERY_LIMIT) {
-			        	Window.alert(status.toString());
-			        } else if (status == DirectionsStatus.REQUEST_DENIED) {
-			        	Window.alert(status.toString());
-			        } else if (status == DirectionsStatus.UNKNOWN_ERROR) {
-			        	Window.alert(status.toString());
-			        } else if (status == DirectionsStatus.ZERO_RESULTS) {
-			        	Window.alert(status.toString());
-			        }
-				
-			}
-		});
-  
-        
-	}
-
-	protected void BorrarPunto(Marker Marked, int Selecctioado) {
 		
-		if (Window.confirm("Esta seguro de que desea borrar el punto"))
-		{
-		GoogleMap Nulo=null;
-		Marked.setMap(Nulo);
-		L.removeItem(Selecctioado);
-		listaMarked.remove(Selecctioado);
+		
+		//Captura de Parametros
+		
+		try {
+			String passId = com.google.gwt.user.client.Window.Location.getParameter("passId");
+			String passEementId = com.google.gwt.user.client.Window.Location.getParameter("passElementId");
+		} catch (Exception e) {
 		}
 		
+		
+		Geolocation geolocation = Geolocation.getIfSupported();
+		if (geolocation != null) {
+		    geolocation.watchPosition(new Callback<Position, PositionError>() {
+		      private FormPanel panel;
+
+			@Override
+		      public void onFailure(PositionError reason) {
+		        //TODO handle error
+		      }
+
+		      @Override
+		      public void onSuccess(Position result) {
+		        Coordinates coor = result.getCoordinates();
+		        panel = new FormPanel();
+		        panel.setWidth("100%");
+		        panel.setHeight("600px");
+		        MapOptions options = MapOptions.create();
+		        options.setCenter(LatLng.create(coor.getLatitude(), coor.getLongitude()));
+		        options.setZoom(14);
+		        options.setMapTypeId(MapTypeId.ROADMAP);
+		        options.setDraggable(true);
+		        options.setMapTypeControl(true);
+		        options.setScaleControl(true);
+		        options.setScrollwheel(true);
+		        options.setDisableDoubleClickZoom(true);
+		        options.setMapMaker(true);
+		        gMap = GoogleMap.create(panel.getElement(), options);
+		        RootPanel.get("centered").add(panel);
+		        fCoder = Geocoder.create();
+		        
+		        
+		        gMap.addDblClickListener(new DblClickHandler() {
+					
+		        	
+		        	
+
+					@Override
+					public void handle(MouseEvent event) {
+						
+						GeocoderRequest GReq = GeocoderRequest.create();
+						GReq.setLocation(event.getLatLng());
+						fCoder.geocode(GReq, new Geocoder.Callback() {
+							
+							
+							
+
+
+							@Override
+							public void handle(JsArray<GeocoderResult> a, GeocoderStatus b) {
+								GeocoderResult result = a.shift();
+//								Window.alert(result.getFormattedAddress());
+								 MarkerOptions mOpts = MarkerOptions.create();
+//							        mOpts.setIcon(markerImage);
+							        mOpts.setPosition(result.getGeometry().getLocation());
+							        
+							        Marker marker = Marker.create(mOpts);
+							        marker.setTitle(result.getFormattedAddress());
+							        marker.setMap(gMap);
+							        
+							        if (ActualMarked!=null)
+							        {
+							        GoogleMap Nulo=null;
+									ActualMarked.setMap(Nulo);
+							        }
+							        
+							        
+									ActualMarked=marker;
+							        
+							}
+						});
+						
+					}
+				});        
+
+
+			       Button submitButton =new Button("Submit");
+			       RootPanel.get("centered").add(submitButton);
+			       
+			       
+			       submitButton.addClickHandler(new ClickHandler() {
+					
+
+					@Override
+					public void onClick(ClickEvent event) {
+						if (ActualMarked!=null)
+							{
+							panel.setAction("/Holapa?lat="+ActualMarked.getPosition().lat()+"&lng="+ActualMarked.getPosition().lng());
+							panel.submit();
+							}
+						else Window.alert(PUNTO_NO_SETEADO);
+						
+					}
+				});
+		        
+		      }
+		    });
+		  }
+
+		
+		        
+        
+        
+//        
+//        listaMarked=new LinkedList<>();
+//        //        Button btn = new Button();
+//        
+////        RootPanel.get("centered").add(btn);
+//
+//
+//        
+//        LatLng centerIcon = LatLng.create(40.4169,-3.7033);
+////        MarkerImage markerImage = MarkerImage.create();
+//        MarkerOptions mOpts = MarkerOptions.create();
+////        mOpts.setIcon(markerImage);
+//        mOpts.setPosition(centerIcon);
+//        
+//        Marker marker = Marker.create(mOpts);
+//        marker.setMap(gMap);
+//        
+////        gMap.addIdleListener(new GoogleMap.IdleHandler() {
+////
+////            public void handle() {
+////                Window.alert("Idle");
+////
+////            }
+////        });
+//        fCoder = Geocoder.create();
+//        L=new ListBox();
+//        L.setVisibleItemCount(5);
+//        L.addClickHandler(new ClickHandler() {
+//			
+//			@Override
+//			public void onClick(ClickEvent event) {
+//				int Selecctioado = L.getSelectedIndex()-1;
+//				if (!listaMarked.isEmpty())
+//					{
+//					
+//					Marker Marked=listaMarked.get(Selecctioado);
+//					BorrarPunto(Marked,Selecctioado);
+//					}
+//				
+//			}
+//		});
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        RootPanel.get("centered").add(L);
+//        
+//        
+//        FormPanel panel2 = new FormPanel();
+//        panel2.setWidth("100%");
+//        panel2.setHeight("600px");
+//        MapOptions options3 = MapOptions.create();
+//        options3.setCenter(LatLng.create(40.4169,-3.7033));
+//        options3.setZoom(13);
+//        options3.setMapTypeId(MapTypeId.ROADMAP);
+//        options3.setDraggable(true);
+//        options3.setMapTypeControl(true);
+//        options3.setScaleControl(true);
+//        options3.setScrollwheel(true);
+//        options3.setMapMaker(true);
+////        Button btn = new Button();
+//        GoogleMap gMap2 = GoogleMap.create(panel2.getElement(), options3);
+//        RootPanel.get("centered").add(panel2);
+////      
+//        
+//        
+//        
+//        DirectionsRendererOptions options2 = DirectionsRendererOptions.create();
+//        final DirectionsRenderer directionsDisplay = DirectionsRenderer.create(options2);
+//        directionsDisplay.setMap(gMap2);
+//        
+//        DirectionsRequest DR = DirectionsRequest.create();
+//        DR.setOrigin(LatLng.create(40.4169,-3.7033));
+//        DR.setDestination(LatLng.create(37.8550964,-4.7086738));
+//        DR.setTravelMode(TravelMode.WALKING);
+//        
+//        DirectionsWaypoint DW=DirectionsWaypoint.create();
+//        
+//        DW.setLocation(LatLng.create(39.8676536,-4.0098788));
+//        DW.setStopover(true);
+//
+//        DirectionsWaypoint DW2=DirectionsWaypoint.create();
+//        
+//        DW2.setLocation(LatLng.create(38.9554156,-3.9809874));
+//        DW2.setStopover(true);
+//        
+//        JsArray<DirectionsWaypoint> waypoints = JsArray.createArray().cast();
+//        waypoints.push(DW);
+//        waypoints.push(DW2);
+//        
+//        
+//        DR.setWaypoints(waypoints);
+//        
+//        DirectionsService DS=DirectionsService.create();
+//        
+//        DS.route(DR, new DirectionsService.Callback() {
+//			
+//			@Override
+//			public void handle(DirectionsResult result, DirectionsStatus status) {
+//				if (status == DirectionsStatus.OK) {
+//			          directionsDisplay.setDirections(result);
+//			        } else if (status == DirectionsStatus.INVALID_REQUEST) {
+//			        	Window.alert(status.toString());
+//			        } else if (status == DirectionsStatus.MAX_WAYPOINTS_EXCEEDED) {
+//			        	Window.alert(status.toString());
+//			        } else if (status == DirectionsStatus.NOT_FOUND) {
+//			        	Window.alert(status.toString());
+//			        } else if (status == DirectionsStatus.OVER_QUERY_LIMIT) {
+//			        	Window.alert(status.toString());
+//			        } else if (status == DirectionsStatus.REQUEST_DENIED) {
+//			        	Window.alert(status.toString());
+//			        } else if (status == DirectionsStatus.UNKNOWN_ERROR) {
+//			        	Window.alert(status.toString());
+//			        } else if (status == DirectionsStatus.ZERO_RESULTS) {
+//			        	Window.alert(status.toString());
+//			        }
+//				
+//			}
+//		});
+  
+        
 	}
 	
 	
