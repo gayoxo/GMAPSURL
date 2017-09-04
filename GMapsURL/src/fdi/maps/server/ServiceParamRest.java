@@ -13,6 +13,7 @@ import javax.ws.rs.core.UriInfo;
 import com.google.gson.Gson;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+import fdi.maps.shared.ConstantsGeoLocal;
 import fdi.ucm.server.interconect.model.Interconect;
 import fdi.ucm.server.interconect.model.Parameter;
 
@@ -22,10 +23,7 @@ public class ServiceParamRest  extends RemoteServiceServlet {
 
 
 	private static final long serialVersionUID = -5608185730468273983L;
-	public static final String GEOLOCALIZATION = "geolocalization";
-	public static final String LATITUDE = "latitude";
-	public static final String LONGITUDE = "longitude";
-	public static final String ICONPATH = "gmaps.png";
+
 	
 	@Context
 	UriInfo uri;
@@ -71,16 +69,16 @@ public class ServiceParamRest  extends RemoteServiceServlet {
 
 					String pathS="http://"+uri.getBaseUri().getHost()+":"+uri.getBaseUri().getPort()+context.getContextPath();
 					
-					IT.setIcon(pathS+"/"+ICONPATH);
-					IT.setName(GEOLOCALIZATION);
+					IT.setIcon(pathS+"/"+ConstantsGeoLocal.ICONPATH);
+					IT.setName(ConstantsGeoLocal.GEOLOCALIZATION);
 					
 			
 					
 					List<Parameter> list=new ArrayList<Parameter>();
 					
 					
-					list.add(new Parameter(GEOLOCALIZATION,LATITUDE));
-					list.add(new Parameter(GEOLOCALIZATION,LONGITUDE));
+					list.add(new Parameter(ConstantsGeoLocal.GEOLOCALIZATION,ConstantsGeoLocal.LATITUDE));
+					list.add(new Parameter(ConstantsGeoLocal.GEOLOCALIZATION,ConstantsGeoLocal.LONGITUDE));
 					
 					
 					IT.setParametros(list);
