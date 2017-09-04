@@ -53,6 +53,7 @@ public class GMapsEJ implements EntryPoint {
 			String passlatitude = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.LATITUDE);
 			String passlongitude = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.LONGITUDE);
 			
+			
 			DLatitude = Double.parseDouble(passlatitude);
 			DLongitude = Double.parseDouble(passlongitude);
 			
