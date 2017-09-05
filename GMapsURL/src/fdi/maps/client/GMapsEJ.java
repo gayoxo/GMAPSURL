@@ -42,6 +42,8 @@ public class GMapsEJ implements EntryPoint {
 	private double DLongitude;
 	private FormPanel panel;
 	private boolean editableAction;
+	private String postUrl;
+	private String passId;
 	
 	public void onModuleLoad() {
 		
@@ -50,10 +52,12 @@ public class GMapsEJ implements EntryPoint {
 		
 		Coordinates P=null;
 		
-		String passId = com.google.gwt.user.client.Window.Location.getParameter("passId");
+		passId = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.PASSID);
 		String passlatitude = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.LATITUDE);
 		String passlongitude = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.LONGITUDE);
 		String edit = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.EDIT);
+		postUrl = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.POSTURL);
+		
 		
 		
 		try {
@@ -244,6 +248,20 @@ public class GMapsEJ implements EntryPoint {
 					        
 					        
 							ActualMarked=marker;
+							
+							
+							 if (postUrl!=null&&!postUrl.isEmpty())
+							 {
+							
+							String URLPOSTF = postUrl+"?"+ConstantsGeoLocal.LATITUDE+"="+ActualMarked.getPosition().lat()+"&"+ConstantsGeoLocal.LONGITUDE+"="+ActualMarked.getPosition().lng();
+							
+							if (passId!=null&&!passId.isEmpty())
+								URLPOSTF=URLPOSTF+"&"+ConstantsGeoLocal.PASSID+"="+passId;
+							
+							panel.setAction(URLPOSTF);
+							panel.submit();
+							 }
+							
 					        
 					}
 				});
@@ -253,24 +271,7 @@ public class GMapsEJ implements EntryPoint {
         }
 
 
-	       Button submitButton =new Button("Submit");
-	       RootPanel.get("centered").add(submitButton);
-	       
-	       
-	       submitButton.addClickHandler(new ClickHandler() {
-			
 
-			@Override
-			public void onClick(ClickEvent event) {
-				if (ActualMarked!=null)
-					{
-					panel.setAction("/Holapa?lat="+ActualMarked.getPosition().lat()+"&lng="+ActualMarked.getPosition().lng());
-					panel.submit();
-					}
-				else Window.alert(PUNTO_NO_SETEADO);
-				
-			}
-		});
 		
 	}
 	
