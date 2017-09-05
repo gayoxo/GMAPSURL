@@ -71,8 +71,8 @@ public class ServiceParamRest  extends RemoteServiceServlet {
 					
 					IT.setIcon(pathS+"/"+ConstantsGeoLocal.ICONPATH);
 					IT.setName(ConstantsGeoLocal.GEOLOCALIZATION);
-					
-			
+					IT.setURLEdicion(pathS+"?"+ConstantsGeoLocal.EDIT+"=true&");
+					IT.setURLVisual(pathS+"?"+ConstantsGeoLocal.EDIT+"=false&");
 					
 					List<Parameter> list=new ArrayList<Parameter>();
 					

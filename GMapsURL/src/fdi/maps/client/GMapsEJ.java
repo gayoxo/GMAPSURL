@@ -41,6 +41,7 @@ public class GMapsEJ implements EntryPoint {
 	private double DLatitude;
 	private double DLongitude;
 	private FormPanel panel;
+	private boolean editableAction;
 	
 	public void onModuleLoad() {
 		
@@ -48,14 +49,28 @@ public class GMapsEJ implements EntryPoint {
 		//Captura de Parametros http://localhost:8080/GMapsURL/?latitude=36.5008762&longitude=-6.2684345
 		
 		Coordinates P=null;
+		
+		String passId = com.google.gwt.user.client.Window.Location.getParameter("passId");
+		String passlatitude = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.LATITUDE);
+		String passlongitude = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.LONGITUDE);
+		String edit = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.EDIT);
+		
+		
 		try {
-			String passId = com.google.gwt.user.client.Window.Location.getParameter("passId");
-			String passlatitude = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.LATITUDE);
-			String passlongitude = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.LONGITUDE);
+			editableAction=Boolean.parseBoolean(edit);
+		} catch (Exception e) {
+			editableAction=false;
+		}
+		
+		try {
+			
+			
 			
 			
 			DLatitude = Double.parseDouble(passlatitude);
 			DLongitude = Double.parseDouble(passlongitude);
+			
+			
 			
 			P= new Coordinates() {
 				
@@ -192,7 +207,7 @@ public class GMapsEJ implements EntryPoint {
         RootPanel.get("centered").add(panel);
         fCoder = Geocoder.create();
         
-        
+        if (editableAction){
         gMap.addDblClickListener(new DblClickHandler() {
 			
         	
@@ -234,7 +249,8 @@ public class GMapsEJ implements EntryPoint {
 				});
 				
 			}
-		});        
+		});     
+        }
 
 
 	       Button submitButton =new Button("Submit");
