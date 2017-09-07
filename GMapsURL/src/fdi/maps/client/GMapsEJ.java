@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.geolocation.client.Geolocation;
 import com.google.gwt.geolocation.client.Position;
 import com.google.gwt.geolocation.client.PositionError;
@@ -48,13 +50,16 @@ public class GMapsEJ implements EntryPoint {
 	private String postUrl;
 	private String passId;
 	private String protocol;
+
+	private boolean Calculado;
+	
+
 	
 	public void onModuleLoad() {
-		
-		
+
 		//Captura de Parametros http://localhost:8080/GMapsURL/?latitude=36.5008762&longitude=-6.2684345
 		
-		Window.alert("Hola");
+		
 		
 		Coordinates P=null;
 		
@@ -144,6 +149,7 @@ public class GMapsEJ implements EntryPoint {
 		
 		if (P==null)
 		{
+			Calculado=false;
 		Geolocation geolocation = Geolocation.getIfSupported();
 		if (geolocation != null) {
 		    geolocation.watchPosition(new Callback<Position, PositionError>() {
@@ -157,8 +163,11 @@ public class GMapsEJ implements EntryPoint {
 		      @Override
 		      public void onSuccess(Position result) {
 		    	  
-		    	  processMap(result.getCoordinates());
-		    	  
+		    	  if (!Calculado)
+		    		  {
+		    		  processMap(result.getCoordinates());
+		    	 	  Calculado=true;
+		    		  }
 		        
 		        
 		      }
@@ -209,10 +218,13 @@ public class GMapsEJ implements EntryPoint {
 	}
 
 	protected void processMap(Coordinates coor) {
+	
+		
         panel = new FormPanel();
         panel.setMethod(FormPanel.METHOD_GET);
         panel.setWidth("100%");
-        panel.setHeight("600px");
+        panel.setHeight((Window.getClientHeight()-20)+"px");
+//        panel.setHeight( "600px");
         MapOptions options = MapOptions.create();
         options.setCenter(LatLng.create(coor.getLatitude(), coor.getLongitude()));
         options.setZoom(14);
@@ -265,23 +277,22 @@ public class GMapsEJ implements EntryPoint {
 					        
 							ActualMarked=marker;
 							
+//							if (postUrl!=null&&!postUrl.isEmpty())
+//							 {
+//							
+//							String URLPOSTF = protocol+"://"+postUrl+"?"+ConstantsGeoLocal.LATITUDE+"="+ActualMarked.getPosition().lat()+"&"+ConstantsGeoLocal.LONGITUDE+"="+ActualMarked.getPosition().lng();
+//							
+//							if (passId!=null&&!passId.isEmpty())
+//								URLPOSTF=URLPOSTF+"&"+ConstantsGeoLocal.PASSID+"="+passId;
+////							Window.alert(URLPOSTF);
+////							panel.setAction(URLPOSTF);
+////							panel.submit();
+//							
+//							doGet(URLPOSTF);
+//					
+//							
+//							 }
 							
-							 if (postUrl!=null&&!postUrl.isEmpty())
-							 {
-							
-							String URLPOSTF = protocol+"://"+postUrl+"?"+ConstantsGeoLocal.LATITUDE+"="+ActualMarked.getPosition().lat()+"&"+ConstantsGeoLocal.LONGITUDE+"="+ActualMarked.getPosition().lng();
-							
-							if (passId!=null&&!passId.isEmpty())
-								URLPOSTF=URLPOSTF+"&"+ConstantsGeoLocal.PASSID+"="+passId;
-//							Window.alert(URLPOSTF);
-//							panel.setAction(URLPOSTF);
-//							panel.submit();
-							
-							doGet(URLPOSTF);
-							
-
-							
-							 }
 							
 					        
 					}
@@ -289,13 +300,48 @@ public class GMapsEJ implements EntryPoint {
 				
 			}
 		});     
+        
+
+
+        Window.addCloseHandler( 
+        	    new CloseHandler<Window>() 
+        	    {
+        	       
+
+					public void onClose( CloseEvent<Window> windowCloseEvent ) 
+        	        {
+	
+							
+						
+        	        	 if (postUrl!=null&&!postUrl.isEmpty())
+						 {
+						
+						String URLPOSTF = protocol+"://"+postUrl+"?";
+						
+						if (ActualMarked!=null)
+							URLPOSTF = URLPOSTF+ConstantsGeoLocal.LATITUDE+"="+ActualMarked.getPosition().lat()+"&"+ConstantsGeoLocal.LONGITUDE+"="+ActualMarked.getPosition().lng();
+						
+							
+						if (passId!=null&&!passId.isEmpty())
+							{
+							if (ActualMarked!=null)
+								URLPOSTF=URLPOSTF+"&";
+							URLPOSTF=URLPOSTF+ConstantsGeoLocal.PASSID+"="+passId;
+							}
+//						Window.alert(URLPOSTF);
+//						panel.setAction(URLPOSTF);
+//						panel.submit();
+						
+						doGet(URLPOSTF);
+						
+	
+						
+						 }
+        	        }
+        	    } ); 
+        
+
         }
-
-
-        
-        
-
-		
 	}
 	
 	
