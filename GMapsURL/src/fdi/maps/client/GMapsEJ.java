@@ -1,5 +1,6 @@
 package fdi.maps.client;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.google.gwt.core.client.Callback;
@@ -15,10 +16,21 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.geolocation.client.Position.Coordinates;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.maps.gwt.client.DirectionsRenderer;
+import com.google.maps.gwt.client.DirectionsRendererOptions;
+import com.google.maps.gwt.client.DirectionsRequest;
+import com.google.maps.gwt.client.DirectionsResult;
+import com.google.maps.gwt.client.DirectionsService;
+import com.google.maps.gwt.client.DirectionsStatus;
+import com.google.maps.gwt.client.DirectionsWaypoint;
 import com.google.maps.gwt.client.Geocoder;
 import com.google.maps.gwt.client.GeocoderRequest;
 import com.google.maps.gwt.client.GeocoderResult;
@@ -32,6 +44,8 @@ import com.google.maps.gwt.client.Marker;
 //import com.google.maps.gwt.client.MarkerImage;
 import com.google.maps.gwt.client.MarkerOptions;
 import com.google.maps.gwt.client.MouseEvent;
+import com.google.maps.gwt.client.TravelMode;
+
 import fdi.maps.shared.ConstantsGeoLocal;
 
 
@@ -43,8 +57,8 @@ public class GMapsEJ implements EntryPoint {
 	private Marker ActualMarked;
 	
 //	private String PUNTO_NO_SETEADO="Point not seted yet, click on map to set the position";
-	private double DLatitude;
-	private double DLongitude;
+//	private double DLatitude;
+//	private double DLongitude;
 	private FormPanel panel;
 	private boolean editableAction;
 	private String postUrl;
@@ -52,6 +66,7 @@ public class GMapsEJ implements EntryPoint {
 	private String protocol;
 
 	private boolean Calculado;
+	private String multy;
 	
 
 	
@@ -70,6 +85,9 @@ public class GMapsEJ implements EntryPoint {
 		postUrl = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.POSTURL);
 		protocol = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.PROTOCOL);
 		
+		multy = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.MULTI);
+		
+		
 		if (protocol!=null)
 			{
 			protocol=protocol.toLowerCase();
@@ -86,60 +104,60 @@ public class GMapsEJ implements EntryPoint {
 			editableAction=false;
 		}
 		
+		
+		boolean multiActivado = false;
+		ArrayList<Coordinates> Coordenada=new ArrayList<Coordinates>();
+		if (multy!=null)
+		{
+			try {
+				JSONValue jsonValue = JSONParser.parseStrict(multy);
+				JSONArray jsonArray = jsonValue.isArray();
+				for (int i = 0; i < jsonArray.size(); i++) {
+					JSONObject point = jsonArray.get(i).isObject();
+					String latii = point.get(ConstantsGeoLocal.LATITUDE).isString().stringValue();
+					String longii = point.get(ConstantsGeoLocal.LONGITUDE).isString().stringValue();
+					Coordinates nueva=new CoordinatesGeo(Double.parseDouble(latii),Double.parseDouble(longii));
+					Coordenada.add(nueva);
+				}
+				
+				if (Coordenada.size()>1)
+					multiActivado=true;
+				else
+					if (Coordenada.size()==1)
+						{
+						passlatitude=Double.toString(Coordenada.get(0).getLatitude());
+						passlongitude=Double.toString(Coordenada.get(0).getLongitude());
+						}
+
+				
+			} catch (Exception e) {
+				Window.alert(e.getMessage());
+			}
+			
+		}
+		
+		
+		if (multiActivado)
+		{
+			
+			processMap(Coordenada.get(0));
+			processRoute(Coordenada);
+			
+		}
+		else
+		{
+		
 		try {
 			
 			
 			
 			
-			DLatitude = Double.parseDouble(passlatitude);
-			DLongitude = Double.parseDouble(passlongitude);
+			double DLatitude = Double.parseDouble(passlatitude);
+			double DLongitude = Double.parseDouble(passlongitude);
 			
 			
 			
-			P= new Coordinates() {
-				
-				@Override
-				public Double getSpeed() {
-					// TODO Auto-generated method stub
-					return null;
-				}
-				
-				@Override
-				public double getLongitude() {
-					// TODO Auto-generated method stub
-					return DLongitude;
-				}
-				
-				@Override
-				public double getLatitude() {
-					// TODO Auto-generated method stub
-					return DLatitude;
-				}
-				
-				@Override
-				public Double getHeading() {
-					// TODO Auto-generated method stub
-					return null;
-				}
-				
-				@Override
-				public Double getAltitudeAccuracy() {
-					// TODO Auto-generated method stub
-					return null;
-				}
-				
-				@Override
-				public Double getAltitude() {
-					// TODO Auto-generated method stub
-					return null;
-				}
-				
-				@Override
-				public double getAccuracy() {
-					// TODO Auto-generated method stub
-					return 0;
-				}
-			};
+			P= new CoordinatesGeo(DLatitude,DLongitude);
 			
 			
 		} catch (Exception e) {
@@ -213,8 +231,60 @@ public class GMapsEJ implements EntryPoint {
 			
 
 		}
-  
+		}
         
+	}
+
+	private void processRoute(ArrayList<Coordinates> coordenada) {
+		DirectionsRendererOptions options2 = DirectionsRendererOptions.create();
+        final DirectionsRenderer directionsDisplay = DirectionsRenderer.create(options2);
+        directionsDisplay.setMap(gMap);
+        DirectionsRequest DR = DirectionsRequest.create();
+        
+        Coordinates Origin = coordenada.get(0);
+        Coordinates Destiny = coordenada.get(coordenada.size()-1);
+        
+        DR.setOrigin(LatLng.create(Origin.getLatitude(),Origin.getLongitude()));
+        DR.setDestination(LatLng.create(Destiny.getLatitude(),Destiny.getLongitude()));
+        DR.setTravelMode(TravelMode.DRIVING);
+        
+        
+        JsArray<DirectionsWaypoint> waypoints = JsArray.createArray().cast();
+        for (int i = 1; i < coordenada.size()-1; i++) {
+        	 Coordinates Stop = coordenada.get(i);
+        	DirectionsWaypoint DW=DirectionsWaypoint.create();
+        	 DW.setLocation(LatLng.create(Stop.getLatitude(),Stop.getLongitude()));
+             DW.setStopover(true);
+             waypoints.push(DW);
+		}
+        
+        DR.setWaypoints(waypoints);
+        
+        DirectionsService DS=DirectionsService.create();
+        DS.route(DR, new DirectionsService.Callback() {
+			
+			@Override
+			public void handle(DirectionsResult result, DirectionsStatus status) {
+				if (status == DirectionsStatus.OK) {
+			          directionsDisplay.setDirections(result);
+			        } else if (status == DirectionsStatus.INVALID_REQUEST) {
+			        	Window.alert(status.toString());
+			        } else if (status == DirectionsStatus.MAX_WAYPOINTS_EXCEEDED) {
+			        	Window.alert(status.toString());
+			        } else if (status == DirectionsStatus.NOT_FOUND) {
+			        	Window.alert(status.toString());
+			        } else if (status == DirectionsStatus.OVER_QUERY_LIMIT) {
+			        	Window.alert(status.toString());
+			        } else if (status == DirectionsStatus.REQUEST_DENIED) {
+			        	Window.alert(status.toString());
+			        } else if (status == DirectionsStatus.UNKNOWN_ERROR) {
+			        	Window.alert(status.toString());
+			        } else if (status == DirectionsStatus.ZERO_RESULTS) {
+			        	Window.alert(status.toString());
+			        }
+				
+			}
+		});
 	}
 
 	protected void processMap(Coordinates coor) {
