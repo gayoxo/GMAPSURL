@@ -247,7 +247,7 @@ public class GMapsEJ implements EntryPoint {
         DirectionsRequest DRWalk = DirectionsRequest.create();
         
         
-        setAllData(DRWalk,Coordenada,TravelMode.WALKING);
+        setAllData(DRWalk,TravelMode.WALKING);
         
         
         
@@ -264,7 +264,7 @@ public class GMapsEJ implements EntryPoint {
 			    	
 			    	 DirectionsRequest DRWalking = DirectionsRequest.create();
 			    	 
-			    	 setAllData(DRWalking,Coordenada,TravelMode.BICYCLING);
+			    	 setAllData(DRWalking,TravelMode.BICYCLING);
 			    	
 			    	 DS.route(DRWalking, new DirectionsService.Callback() {
 			 			
@@ -276,7 +276,7 @@ public class GMapsEJ implements EntryPoint {
 			 			          {
 			 			    	 DirectionsRequest DRDrive = DirectionsRequest.create();
 						    	 
-						    	 setAllData(DRDrive,Coordenada,TravelMode.DRIVING);
+						    	 setAllData(DRDrive,TravelMode.DRIVING);
 						    	
 						    	 DS.route(DRDrive, new DirectionsService.Callback() {
 						 			
@@ -337,9 +337,9 @@ public class GMapsEJ implements EntryPoint {
 		});
 	}
 
-	private void setAllData(DirectionsRequest DRWalk, ArrayList<Coordinates> coordenada, TravelMode mode) {
-		Coordinates Origin = coordenada.get(0);
-        Coordinates Destiny = coordenada.get(coordenada.size()-1);
+	private void setAllData(DirectionsRequest DRWalk, TravelMode mode) {
+		Coordinates Origin = Coordenada.get(0);
+        Coordinates Destiny = Coordenada.get(Coordenada.size()-1);
         
         DRWalk.setOrigin(LatLng.create(Origin.getLatitude(),Origin.getLongitude()));
         DRWalk.setDestination(LatLng.create(Destiny.getLatitude(),Destiny.getLongitude()));
@@ -347,8 +347,8 @@ public class GMapsEJ implements EntryPoint {
         
         
         JsArray<DirectionsWaypoint> waypoints = JsArray.createArray().cast();
-        for (int i = 1; i < coordenada.size()-1; i++) {
-        	 Coordinates Stop = coordenada.get(i);
+        for (int i = 1; i < Coordenada.size()-1; i++) {
+        	 Coordinates Stop = Coordenada.get(i);
         	DirectionsWaypoint DW=DirectionsWaypoint.create();
         	 DW.setLocation(LatLng.create(Stop.getLatitude(),Stop.getLongitude()));
              DW.setStopover(true);
