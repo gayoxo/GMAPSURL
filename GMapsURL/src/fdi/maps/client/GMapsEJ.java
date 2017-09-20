@@ -67,6 +67,8 @@ public class GMapsEJ implements EntryPoint {
 
 	private boolean Calculado;
 	private String multy;
+	private DirectionsService DS;
+	private ArrayList<Coordinates> Coordenada;
 	
 
 	
@@ -139,9 +141,9 @@ public class GMapsEJ implements EntryPoint {
 		
 		if (multiActivado)
 		{
-			
+			this.Coordenada=Coordenada;
 			processMap(Coordenada.get(0));
-			processRoute(Coordenada);
+			processRoute();
 			
 		}
 		else
@@ -235,18 +237,113 @@ public class GMapsEJ implements EntryPoint {
         
 	}
 
-	private void processRoute(ArrayList<Coordinates> coordenada) {
+	private void processRoute() {
 		DirectionsRendererOptions options2 = DirectionsRendererOptions.create();
         final DirectionsRenderer directionsDisplay = DirectionsRenderer.create(options2);
         directionsDisplay.setMap(gMap);
-        DirectionsRequest DR = DirectionsRequest.create();
         
-        Coordinates Origin = coordenada.get(0);
+        
+        
+        DirectionsRequest DRWalk = DirectionsRequest.create();
+        
+        
+        setAllData(DRWalk,Coordenada,TravelMode.WALKING);
+        
+        
+        
+        DS=DirectionsService.create();
+               
+        DS.route(DRWalk, new DirectionsService.Callback() {
+			
+			@Override
+			public void handle(DirectionsResult result, DirectionsStatus status) {
+				if (status == DirectionsStatus.OK) 
+			          directionsDisplay.setDirections(result);
+			    else
+			          {
+			    	
+			    	 DirectionsRequest DRWalking = DirectionsRequest.create();
+			    	 
+			    	 setAllData(DRWalking,Coordenada,TravelMode.BICYCLING);
+			    	
+			    	 DS.route(DRWalking, new DirectionsService.Callback() {
+			 			
+			 			@Override
+			 			public void handle(DirectionsResult result, DirectionsStatus status) {
+			 				if (status == DirectionsStatus.OK) 
+			 			          directionsDisplay.setDirections(result);
+			 			    else
+			 			          {
+			 			    	 DirectionsRequest DRDrive = DirectionsRequest.create();
+						    	 
+						    	 setAllData(DRDrive,Coordenada,TravelMode.DRIVING);
+						    	
+						    	 DS.route(DRDrive, new DirectionsService.Callback() {
+						 			
+						 			@Override
+						 			public void handle(DirectionsResult result, DirectionsStatus status) {
+						 				if (status == DirectionsStatus.OK) 
+						 			          directionsDisplay.setDirections(result);
+						 			    else
+						 			          {
+						 			    		Window.alert("I cant find a Route");
+						 			    		for (Coordinates coordinates : Coordenada) {
+						 			    			GeocoderRequest GReq = GeocoderRequest.create();
+						 			   			GReq.setLocation(LatLng.create(coordinates.getLatitude(), coordinates.getLongitude()));
+						 			   			fCoder.geocode(GReq, new Geocoder.Callback() {
+						 			   				
+						 			   				
+						 			   				
+
+
+						 			   				@Override
+						 			   				public void handle(JsArray<GeocoderResult> a, GeocoderStatus b) {
+						 			   					GeocoderResult result = a.shift();
+//						 			   					Window.alert(result.getFormattedAddress());
+						 			   					 MarkerOptions mOpts = MarkerOptions.create();
+//						 			   				        mOpts.setIcon(markerImage);
+						 			   				        mOpts.setPosition(result.getGeometry().getLocation());
+						 			   				        
+						 			   				        Marker marker = Marker.create(mOpts);
+						 			   				        marker.setTitle(result.getFormattedAddress());
+						 			   				        marker.setMap(gMap);
+						 			   				        
+//						 			   				        if (ActualMarked!=null)
+//						 			   				        {
+//						 			   				        GoogleMap Nulo=null;
+//						 			   						ActualMarked.setMap(Nulo);
+//						 			   				        }
+//						 			   				        
+//						 			   				        
+//						 			   						ActualMarked=marker;
+						 			   				        
+						 			   				}
+						 			   			});
+												}
+						 			          }
+						 			        
+						 				
+						 			}
+						 		});
+			 			          }
+			 			        
+			 				
+			 			}
+			 		});
+			          }
+			        
+				
+			}
+		});
+	}
+
+	private void setAllData(DirectionsRequest DRWalk, ArrayList<Coordinates> coordenada, TravelMode mode) {
+		Coordinates Origin = coordenada.get(0);
         Coordinates Destiny = coordenada.get(coordenada.size()-1);
         
-        DR.setOrigin(LatLng.create(Origin.getLatitude(),Origin.getLongitude()));
-        DR.setDestination(LatLng.create(Destiny.getLatitude(),Destiny.getLongitude()));
-        DR.setTravelMode(TravelMode.DRIVING);
+        DRWalk.setOrigin(LatLng.create(Origin.getLatitude(),Origin.getLongitude()));
+        DRWalk.setDestination(LatLng.create(Destiny.getLatitude(),Destiny.getLongitude()));
+        DRWalk.setTravelMode(mode);
         
         
         JsArray<DirectionsWaypoint> waypoints = JsArray.createArray().cast();
@@ -258,33 +355,8 @@ public class GMapsEJ implements EntryPoint {
              waypoints.push(DW);
 		}
         
-        DR.setWaypoints(waypoints);
-        
-        DirectionsService DS=DirectionsService.create();
-        DS.route(DR, new DirectionsService.Callback() {
-			
-			@Override
-			public void handle(DirectionsResult result, DirectionsStatus status) {
-				if (status == DirectionsStatus.OK) {
-			          directionsDisplay.setDirections(result);
-			        } else if (status == DirectionsStatus.INVALID_REQUEST) {
-			        	Window.alert(status.toString());
-			        } else if (status == DirectionsStatus.MAX_WAYPOINTS_EXCEEDED) {
-			        	Window.alert(status.toString());
-			        } else if (status == DirectionsStatus.NOT_FOUND) {
-			        	Window.alert(status.toString());
-			        } else if (status == DirectionsStatus.OVER_QUERY_LIMIT) {
-			        	Window.alert(status.toString());
-			        } else if (status == DirectionsStatus.REQUEST_DENIED) {
-			        	Window.alert(status.toString());
-			        } else if (status == DirectionsStatus.UNKNOWN_ERROR) {
-			        	Window.alert(status.toString());
-			        } else if (status == DirectionsStatus.ZERO_RESULTS) {
-			        	Window.alert(status.toString());
-			        }
-				
-			}
-		});
+        DRWalk.setWaypoints(waypoints);
+		
 	}
 
 	protected void processMap(Coordinates coor) {
