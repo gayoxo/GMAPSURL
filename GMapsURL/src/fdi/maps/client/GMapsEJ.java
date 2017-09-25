@@ -2,7 +2,6 @@ package fdi.maps.client;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JsArray;
@@ -280,50 +279,72 @@ public class GMapsEJ implements EntryPoint {
 						    	
 						    	 DS.route(DRDrive, new DirectionsService.Callback() {
 						 			
-						 			@Override
+
+
+									@Override
 						 			public void handle(DirectionsResult result, DirectionsStatus status) {
 						 				if (status == DirectionsStatus.OK) 
 						 			          directionsDisplay.setDirections(result);
 						 			    else
 						 			          {
 						 			    		Window.alert("I cant find a Route");
-						 			    		for (Coordinates coordinates : Coordenada) {
-						 			    			GeocoderRequest GReq = GeocoderRequest.create();
-						 			   			GReq.setLocation(LatLng.create(coordinates.getLatitude(), coordinates.getLongitude()));
-						 			   			fCoder.geocode(GReq, new Geocoder.Callback() {
-						 			   				
-						 			   				
-						 			   				
+						 			    		
+						 			    		int P=1;
+						 			    		for (Coordinates coordinates : Coordenada)
+						 			    		{
+				 			   					 MarkerOptions mOpts = MarkerOptions.create();
+				 			   				        mOpts.setPosition(LatLng.create(coordinates.getLatitude(), coordinates.getLongitude()));
+				 			   				        
+				 			   				        Marker marker = Marker.create(mOpts);
+				 			   				        marker.setTitle(Integer.toString(P));
+				 			   				        P++;
+				 			   				        marker.setMap(gMap);
+						 			    		}
+						 			    		
+						 			    		
 
-
-						 			   				@Override
-						 			   				public void handle(JsArray<GeocoderResult> a, GeocoderStatus b) {
-						 			   					GeocoderResult result = a.shift();
-//						 			   					Window.alert(result.getFormattedAddress());
-						 			   					 MarkerOptions mOpts = MarkerOptions.create();
-//						 			   				        mOpts.setIcon(markerImage);
-						 			   				        mOpts.setPosition(result.getGeometry().getLocation());
-						 			   				        
-						 			   				        Marker marker = Marker.create(mOpts);
-						 			   				        marker.setTitle(result.getFormattedAddress());
-						 			   				        marker.setMap(gMap);
-						 			   				        
-//						 			   				        if (ActualMarked!=null)
-//						 			   				        {
-//						 			   				        GoogleMap Nulo=null;
-//						 			   						ActualMarked.setMap(Nulo);
-//						 			   				        }
+						 			    		
+						 			    		
+						 			    		
+//						 			    		for (Coordinates coordinates : Coordenada) {
+//						 			    		GeocoderRequest GReq = GeocoderRequest.create();
+//						 			   			GReq.setLocation(LatLng.create(coordinates.getLatitude(), coordinates.getLongitude()));
+//						 			   			fCoder.geocode(GReq, new Geocoder.Callback() {
+//						 			   				
+//						 			   				
+//						 			   				
+//
+//
+//						 			   				@Override
+//						 			   				public void handle(JsArray<GeocoderResult> a, GeocoderStatus b) {
+//						 			   					GeocoderResult result = a.shift();
+////						 			   					Window.alert(result.getFormattedAddress());
+//						 			   					 MarkerOptions mOpts = MarkerOptions.create();
+////						 			   				        mOpts.setIcon(markerImage);
+//						 			   				        mOpts.setPosition(result.getGeometry().getLocation());
 //						 			   				        
+//						 			   				        Marker marker = Marker.create(mOpts);
+//						 			   				        marker.setTitle(result.getFormattedAddress());
+//						 			   				        marker.setMap(gMap);
 //						 			   				        
-//						 			   						ActualMarked=marker;
-						 			   				        
-						 			   				}
-						 			   			});
-												}
+////						 			   				        if (ActualMarked!=null)
+////						 			   				        {
+////						 			   				        GoogleMap Nulo=null;
+////						 			   						ActualMarked.setMap(Nulo);
+////						 			   				        }
+////						 			   				        
+////						 			   				        
+////						 			   						ActualMarked=marker;
+//						 			   				        
+//						 			   				}
+//						 			   			});
+//												}
 						 			          }
 						 			        
 						 				
 						 			}
+
+
 						 		});
 			 			          }
 			 			        
