@@ -23,13 +23,6 @@ import com.google.gwt.geolocation.client.Position.Coordinates;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.maps.gwt.client.DirectionsRenderer;
-import com.google.maps.gwt.client.DirectionsRendererOptions;
-import com.google.maps.gwt.client.DirectionsRequest;
-import com.google.maps.gwt.client.DirectionsResult;
-import com.google.maps.gwt.client.DirectionsService;
-import com.google.maps.gwt.client.DirectionsStatus;
-import com.google.maps.gwt.client.DirectionsWaypoint;
 import com.google.maps.gwt.client.Geocoder;
 import com.google.maps.gwt.client.GeocoderRequest;
 import com.google.maps.gwt.client.GeocoderResult;
@@ -37,14 +30,16 @@ import com.google.maps.gwt.client.GeocoderStatus;
 import com.google.maps.gwt.client.GoogleMap;
 import com.google.maps.gwt.client.GoogleMap.DblClickHandler;
 import com.google.maps.gwt.client.LatLng;
+import com.google.maps.gwt.client.MVCArray;
 import com.google.maps.gwt.client.MapOptions;
 import com.google.maps.gwt.client.MapTypeId;
 import com.google.maps.gwt.client.Marker;
+import com.google.maps.gwt.client.MarkerImage;
 //import com.google.maps.gwt.client.MarkerImage;
 import com.google.maps.gwt.client.MarkerOptions;
 import com.google.maps.gwt.client.MouseEvent;
-import com.google.maps.gwt.client.TravelMode;
-
+import com.google.maps.gwt.client.Polyline;
+import com.google.maps.gwt.client.PolylineOptions;
 import fdi.maps.shared.ConstantsGeoLocal;
 
 
@@ -66,7 +61,7 @@ public class GMapsEJ implements EntryPoint {
 
 	private boolean Calculado;
 	private String multy;
-	private DirectionsService DS;
+//	private DirectionsService DS;
 	private ArrayList<Coordinates> Coordenada;
 	
 
@@ -213,10 +208,12 @@ public class GMapsEJ implements EntryPoint {
 					 MarkerOptions mOpts = MarkerOptions.create();
 //				        mOpts.setIcon(markerImage);
 				        mOpts.setPosition(result.getGeometry().getLocation());
+				        mOpts.setIcon(MarkerImage.create("IconoRojo.png"));
 				        
 				        Marker marker = Marker.create(mOpts);
 				        marker.setTitle(result.getFormattedAddress());
 				        marker.setMap(gMap);
+				        
 				        
 				        if (ActualMarked!=null)
 				        {
@@ -237,6 +234,47 @@ public class GMapsEJ implements EntryPoint {
 	}
 
 	private void processRoute() {
+		
+		
+		
+		
+		int cc=1;
+        for (int i = 0; i < Coordenada.size(); i++) {        	 
+			Coordinates lng=Coordenada.get(i);
+			MarkerOptions mOptsT = MarkerOptions.create();
+			 mOptsT.setPosition(LatLng.create(lng.getLatitude(), lng.getLongitude()));
+			if (i==0)
+				 mOptsT.setIcon(MarkerImage.create("IconoRojo.png"));
+			else
+				if (i==Coordenada.size()-1)
+					 mOptsT.setIcon(MarkerImage.create("IconoAzul.png"));
+				else
+					 mOptsT.setIcon(MarkerImage.create("IconoAmarillo.png"));
+			  Marker marker2 = Marker.create(mOptsT);
+		        marker2.setTitle(Integer.toString(cc));
+		        cc++;
+		        
+		        marker2.setMap(gMap);
+			
+		}
+        
+        
+        MVCArray<LatLng> latLngArray = MVCArray.create();  
+        for (Coordinates lng : Coordenada) {  
+            latLngArray.push(LatLng.create(lng.getLatitude(), lng.getLongitude()));  
+        }  
+        PolylineOptions polyOpts = PolylineOptions.create();  
+        polyOpts.setPath(latLngArray);  
+        polyOpts.setStrokeColor("red");  
+        polyOpts.setStrokeOpacity(0.5);  
+        polyOpts.setStrokeWeight(5);  
+        Polyline path = Polyline.create(polyOpts);  
+        path.setMap(gMap);
+		
+		
+		
+		/*
+		
 		DirectionsRendererOptions options2 = DirectionsRendererOptions.create();
         final DirectionsRenderer directionsDisplay = DirectionsRenderer.create(options2);
         directionsDisplay.setMap(gMap);
@@ -356,29 +394,30 @@ public class GMapsEJ implements EntryPoint {
 				
 			}
 		});
+		*/
 	}
 
-	private void setAllData(DirectionsRequest DRWalk, TravelMode mode) {
-		Coordinates Origin = Coordenada.get(0);
-        Coordinates Destiny = Coordenada.get(Coordenada.size()-1);
-        
-        DRWalk.setOrigin(LatLng.create(Origin.getLatitude(),Origin.getLongitude()));
-        DRWalk.setDestination(LatLng.create(Destiny.getLatitude(),Destiny.getLongitude()));
-        DRWalk.setTravelMode(mode);
-        
-        
-        JsArray<DirectionsWaypoint> waypoints = JsArray.createArray().cast();
-        for (int i = 1; i < Coordenada.size()-1; i++) {
-        	 Coordinates Stop = Coordenada.get(i);
-        	DirectionsWaypoint DW=DirectionsWaypoint.create();
-        	 DW.setLocation(LatLng.create(Stop.getLatitude(),Stop.getLongitude()));
-             DW.setStopover(true);
-             waypoints.push(DW);
-		}
-        
-        DRWalk.setWaypoints(waypoints);
-		
-	}
+//	private void setAllData(DirectionsRequest DRWalk, TravelMode mode) {
+//		Coordinates Origin = Coordenada.get(0);
+//        Coordinates Destiny = Coordenada.get(Coordenada.size()-1);
+//        
+//        DRWalk.setOrigin(LatLng.create(Origin.getLatitude(),Origin.getLongitude()));
+//        DRWalk.setDestination(LatLng.create(Destiny.getLatitude(),Destiny.getLongitude()));
+//        DRWalk.setTravelMode(mode);
+//        
+//        
+//        JsArray<DirectionsWaypoint> waypoints = JsArray.createArray().cast();
+//        for (int i = 1; i < Coordenada.size()-1; i++) {
+//        	 Coordinates Stop = Coordenada.get(i);
+//        	DirectionsWaypoint DW=DirectionsWaypoint.create();
+//        	 DW.setLocation(LatLng.create(Stop.getLatitude(),Stop.getLongitude()));
+//             DW.setStopover(true);
+//             waypoints.push(DW);
+//		}
+//        
+//        DRWalk.setWaypoints(waypoints);
+//		
+//	}
 
 	protected void processMap(Coordinates coor) {
 	
@@ -430,6 +469,7 @@ public class GMapsEJ implements EntryPoint {
 					        Marker marker = Marker.create(mOpts);
 					        marker.setTitle(result.getFormattedAddress());
 					        marker.setMap(gMap);
+					        mOpts.setIcon(MarkerImage.create("IconoRojo.png"));
 					        
 					        if (ActualMarked!=null)
 					        {
