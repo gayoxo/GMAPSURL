@@ -23,6 +23,7 @@ import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.geolocation.client.Position.Coordinates;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -51,6 +52,7 @@ import com.google.maps.gwt.client.PolylineOptions;
 import fdi.maps.shared.ConstantsGeoLocal;
 
 
+
 public class GMapsEJ implements EntryPoint {
 	protected static final String ERROR_SETTING_DATA= "Error sending data to edition, try again and test asociated systems";
 	public static final String GEOICONRED = "Geo/IconoRojo.png";
@@ -75,6 +77,9 @@ public class GMapsEJ implements EntryPoint {
 //	private DirectionsService DS;
 	private ArrayList<Coordinates> Coordenada;
 private Autocomplete autoComplete;
+private static GMapsServiceAsync serviceGMaps = GWT.create(GMapsService.class);
+private String extradata;
+private String datageturl;
 	
 
 	
@@ -92,8 +97,31 @@ private Autocomplete autoComplete;
 		String edit = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.EDIT);
 		postUrl = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.POSTURL);
 		protocol = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.PROTOCOL);
+		extradata  = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.EXTRADATA);
+		datageturl = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.DATAGETURL);
 		
 		multy = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.MULTI);
+		
+		
+		if (extradata!=null&&datageturl!=null)
+		{
+			GWT.log(extradata
+					+"-"+datageturl);
+			serviceGMaps.getExtradata(extradata,datageturl,protocol,new AsyncCallback<String>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					Window.alert("Error obnteniendo los datos extra de la posicion");
+					
+				}
+
+				@Override
+				public void onSuccess(String result) {
+					Window.alert("Correcto");
+					
+				}
+			});
+		}
 		
 		
 		if (protocol!=null)

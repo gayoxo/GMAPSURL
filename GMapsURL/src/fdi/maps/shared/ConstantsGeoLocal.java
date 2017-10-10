@@ -13,4 +13,6 @@ public class ConstantsGeoLocal {
 		public static final String PASSID = "passid";
 		public static final String PROTOCOL = "protocol";
 		public static final String MULTI = "multi";
+		public static final String EXTRADATA = "extradata";
+		public static final String DATAGETURL = "datageturl";
 }
