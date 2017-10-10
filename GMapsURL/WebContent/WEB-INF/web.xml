@@ -8,7 +8,7 @@
   <!-- Servlets -->
   <servlet>
     <servlet-name>greetServlet</servlet-name>
-    <servlet-class>fdi.maps.server.GreetingServiceImpl</servlet-class>
+    <servlet-class>fdi.maps.server.GMapsServiceImpl</servlet-class>
   </servlet>
   
   <servlet-mapping>
