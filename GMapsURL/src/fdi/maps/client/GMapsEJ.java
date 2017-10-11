@@ -17,10 +17,6 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.json.client.JSONArray;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONParser;
-import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.geolocation.client.Position.Coordinates;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -50,6 +46,7 @@ import com.google.maps.gwt.client.MouseEvent;
 import com.google.maps.gwt.client.Polyline;
 import com.google.maps.gwt.client.PolylineOptions;
 import fdi.maps.shared.ConstantsGeoLocal;
+import fdi.maps.shared.MarkersParametre;
 
 
 
@@ -73,7 +70,7 @@ public class GMapsEJ implements EntryPoint {
 	private String protocol;
 
 	private boolean Calculado;
-	private String multy;
+//	private String multy;
 //	private DirectionsService DS;
 	private ArrayList<Coordinates> Coordenada;
 private Autocomplete autoComplete;
@@ -89,49 +86,27 @@ private String datageturl;
 		
 		
 		
-		Coordinates P=null;
+//		Coordinates P=null;
 		
 		passId = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.PASSID);
-		String passlatitude = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.LATITUDE);
-		String passlongitude = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.LONGITUDE);
+//		String passlatitude = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.LATITUDE);
+//		String passlongitude = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.LONGITUDE);
 		String edit = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.EDIT);
 		postUrl = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.POSTURL);
 		protocol = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.PROTOCOL);
 		extradata  = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.EXTRADATA);
 		datageturl = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.DATAGETURL);
 		
-		multy = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.MULTI);
-		
-		
-		if (extradata!=null&&datageturl!=null)
-		{
-			GWT.log(extradata
-					+"-"+datageturl);
-			serviceGMaps.getExtradata(extradata,datageturl,protocol,new AsyncCallback<String>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					Window.alert("Error obnteniendo los datos extra de la posicion");
-					
-				}
-
-				@Override
-				public void onSuccess(String result) {
-					Window.alert("Correcto");
-					
-				}
-			});
-		}
-		
+//		multy = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.MULTI);
 		
 		if (protocol!=null)
-			{
-			protocol=protocol.toLowerCase();
-			if (!protocol.toLowerCase().equals("http")||protocol.toLowerCase().equals("https"))
-				protocol="http";
-			}
-		else
+		{
+		protocol=protocol.toLowerCase();
+		if (!protocol.toLowerCase().equals("http")||protocol.toLowerCase().equals("https"))
 			protocol="http";
+		}
+	else
+		protocol="http";
 		
 		
 		try {
@@ -140,11 +115,214 @@ private String datageturl;
 			editableAction=false;
 		}
 		
+		if (extradata!=null&&datageturl!=null)
+		{
+			GWT.log(extradata
+					+"-"+datageturl);
+			serviceGMaps.getExtradata(extradata,datageturl,protocol,new AsyncCallback<ArrayList<MarkersParametre>>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					Window.alert("Error obnteniendo los datos extra de la posicion");
+					
+				}
+
+				@Override
+				public void onSuccess(ArrayList<MarkersParametre> result) {
+					
+					boolean multiActivado = false;
+					double DLatitude;
+					double DLongitude;
+					ArrayList<Coordinates> Coordenadainterna=new ArrayList<Coordinates>();
+					
+					if (result.size()>1)
+					{
+					
+						
+						
+							
+							
+							try {
+	
+								for (int i = 0; i < result.size(); i++) {
+									MarkersParametre markersParametreA = result.get(i);
+									Coordinates nueva=new CoordinatesGeo(markersParametreA.getLat(),markersParametreA.getLng());
+									Coordenadainterna.add(nueva);
+								}
+								
+								if (Coordenadainterna.size()>1)
+									multiActivado=true;
+								else
+									if (Coordenadainterna.size()==1)
+										{
+										DLatitude=Coordenadainterna.get(0).getLatitude();
+										DLatitude=Coordenadainterna.get(0).getLongitude();
+										}
+
+								
+							} catch (Exception e) {
+								Window.alert(e.getMessage());
+							}
+							
+						
+					}
+						
+						if (multiActivado)
+						{
+							Coordenada=Coordenadainterna;
+							processMap(Coordenadainterna.get(0));
+							processRoute();
+							
+						}
+						else
+						{
+						
+						Coordinates P=null;
+						
+						if (!result.isEmpty())
+						{
+							
+							MarkersParametre markersParametreA = result.get(0);	
+							
+						
+						
+						try {
+							
+							
+							
+							
+							DLatitude = markersParametreA.getLat();
+							DLongitude = markersParametreA.getLng();
+							
+							
+							
+							P= new CoordinatesGeo(DLatitude,DLongitude);
+							
+							
+						} catch (Exception e) {
+							P=null;
+						}
+						}
+						
+						
+						if (P==null)
+						{
+							Calculado=false;
+						Geolocation geolocation = Geolocation.getIfSupported();
+						if (geolocation != null) {
+						    geolocation.watchPosition(new Callback<Position, PositionError>() {
+						      
+
+							@Override
+						      public void onFailure(PositionError reason) {
+						        //TODO handle error
+						      }
+
+						      @Override
+						      public void onSuccess(Position result) {
+						    	  
+						    	  if (!Calculado)
+						    		  {
+						    		  processMap(result.getCoordinates());
+						    	 	  Calculado=true;
+						    		  }
+						        
+						        
+						      }
+						    });
+						  }
+
+						}else
+						{
+							processMap(P);
+							
+							
+							GeocoderRequest GReq = GeocoderRequest.create();
+							GReq.setLocation(LatLng.create(P.getLatitude(), P.getLongitude()));
+							fCoder.geocode(GReq, new Geocoder.Callback() {
+								
+								
+								
+
+
+								@Override
+								public void handle(JsArray<GeocoderResult> a, GeocoderStatus b) {
+									GeocoderResult result = a.shift();
+//									Window.alert(result.getFormattedAddress());
+									 MarkerOptions mOpts = MarkerOptions.create();
+//								        mOpts.setIcon(markerImage);
+								        mOpts.setPosition(result.getGeometry().getLocation());
+								        mOpts.setIcon(MarkerImage.create(GEOICONRED));
+								        
+								        Marker marker = Marker.create(mOpts);
+								        marker.setTitle(result.getFormattedAddress());
+								        marker.setMap(gMap);
+								        
+								        
+								        if (ActualMarked!=null)
+								        {
+								        GoogleMap Nulo=null;
+										ActualMarked.setMap(Nulo);
+								        }
+								        
+								        
+										ActualMarked=marker;
+								        
+								}
+							});
+							
+
+						
+					}
+						
+					}
+					
+				}
+
+
+			});
+		}else
+		{
+
+				Calculado=false;
+			Geolocation geolocation = Geolocation.getIfSupported();
+			if (geolocation != null) {
+			    geolocation.watchPosition(new Callback<Position, PositionError>() {
+			      
+
+				@Override
+			      public void onFailure(PositionError reason) {
+			        //TODO handle error
+			      }
+
+			      @Override
+			      public void onSuccess(Position result) {
+			    	  
+			    	  if (!Calculado)
+			    		  {
+			    		  processMap(result.getCoordinates());
+			    	 	  Calculado=true;
+			    		  }
+			        
+			        
+			      }
+			    });
+			  }
+
+		}
+		
+		
+		
+		
+		/*
+		
 		
 		boolean multiActivado = false;
 		ArrayList<Coordinates> Coordenada=new ArrayList<Coordinates>();
 		if (multy!=null)
 		{
+			
+			
 			try {
 				JSONValue jsonValue = JSONParser.parseStrict(multy);
 				JSONArray jsonArray = jsonValue.isArray();
@@ -270,7 +448,7 @@ private String datageturl;
 
 		}
 		}
-        
+        */
 	}
 
 	private void processRoute() {

@@ -3,12 +3,17 @@ package fdi.maps.server;
 import fdi.maps.client.GMapsService;
 import fdi.maps.shared.ConstantsGeoLocal;
 import fdi.maps.shared.FieldVerifier;
+import fdi.maps.shared.MarkersParametre;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
@@ -54,16 +59,9 @@ public class GMapsServiceImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String getExtradata(String extradata, String datageturl, String protocol) {
+	public ArrayList<MarkersParametre> getExtradata(String extradata, String datageturl, String protocol) {
 		
-		if (protocol!=null)
-		{
-		protocol=protocol.toLowerCase();
-		if (!protocol.toLowerCase().equals("http")||protocol.toLowerCase().equals("https"))
-			protocol="http";
-		}
-	else
-		protocol="http";
+
 		
 		
 		try {
@@ -77,10 +75,41 @@ public class GMapsServiceImpl extends RemoteServiceServlet implements
 		         result.append(line);
 		      }
 		      rd.close();
-		      return result.toString();
+		      
+		      
+		      String Valor = result.toString();
+		      Gson G=new Gson();
+		      @SuppressWarnings("rawtypes")
+			ArrayList ValoresLista = G.fromJson(Valor, ArrayList.class);
+		      
+//		      listaJson.add(structureId);
+//			    listaJson.add(lisParam);
+		      @SuppressWarnings({ "unchecked", "unused" })
+			List<Long> structureId=(List<Long>) ValoresLista.get(0);
+		      @SuppressWarnings("unchecked")
+			List<LinkedTreeMap<String, String>> lisParam= (List<LinkedTreeMap<String, String>>) ValoresLista.get(1);
+		      
+		      ArrayList<MarkersParametre> Salida = new ArrayList<MarkersParametre>();
+		      for (LinkedTreeMap<String, String> hashMap : lisParam) {
+		    	  String Lat=hashMap.get(ConstantsGeoLocal.LATITUDE);
+		    	  String Lng=hashMap.get(ConstantsGeoLocal.LONGITUDE);
+		    	  if (Lat!=null&&!Lat.isEmpty()&&Lng!=null&&!Lng.isEmpty())
+		    	  {
+		    		  try {
+		    			  MarkersParametre KM = new MarkersParametre(Double.parseDouble(Lat), Double.parseDouble(Lng));
+				    	  Salida.add(KM);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+		    	 
+		    	  }
+		      }
+		      
+		      
+		      return Salida;
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "";
+			return new ArrayList<MarkersParametre>();
 		}
 	}
 
