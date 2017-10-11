@@ -20,6 +20,7 @@ public class MarkersParametre implements Serializable,IsSerializable{
 	private static final long serialVersionUID = 1L;
 	private Double lat;
 	private Double lng;
+	private String urlFrame;
 
 	
 	
@@ -29,10 +30,11 @@ public class MarkersParametre implements Serializable,IsSerializable{
 
 
 
-	public MarkersParametre(Double lat, Double lng) {
+	public MarkersParametre(Double lat, Double lng, String UrlFrame) {
 		super();
 		this.lat = lat;
 		this.lng = lng;
+		this.urlFrame=UrlFrame;
 	}
 
 
@@ -44,5 +46,9 @@ public class MarkersParametre implements Serializable,IsSerializable{
 	
 	public Double getLng() {
 		return lng;
+	}
+	
+	public String getUrlFrame() {
+		return urlFrame;
 	}
 }

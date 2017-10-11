@@ -84,19 +84,30 @@ public class GMapsServiceImpl extends RemoteServiceServlet implements
 		      
 //		      listaJson.add(structureId);
 //			    listaJson.add(lisParam);
-		      @SuppressWarnings({ "unchecked", "unused" })
-			List<Long> structureId=(List<Long>) ValoresLista.get(0);
+		      @SuppressWarnings("unchecked")
+			List<Double> structureId=(List<Double>) ValoresLista.get(0);
 		      @SuppressWarnings("unchecked")
 			List<LinkedTreeMap<String, String>> lisParam= (List<LinkedTreeMap<String, String>>) ValoresLista.get(1);
 		      
 		      ArrayList<MarkersParametre> Salida = new ArrayList<MarkersParametre>();
-		      for (LinkedTreeMap<String, String> hashMap : lisParam) {
+		      
+		      for (int i = 0; i < lisParam.size(); i++) {
+		    	  LinkedTreeMap<String, String> hashMap=lisParam.get(i);
+
+		    	  Long IdDoce=null;
+		    	  if (structureId.size()>i)
+		    		  IdDoce=structureId.get(i).longValue();
+		    	  
 		    	  String Lat=hashMap.get(ConstantsGeoLocal.LATITUDE);
 		    	  String Lng=hashMap.get(ConstantsGeoLocal.LONGITUDE);
 		    	  if (Lat!=null&&!Lat.isEmpty()&&Lng!=null&&!Lng.isEmpty())
 		    	  {
 		    		  try {
-		    			  MarkersParametre KM = new MarkersParametre(Double.parseDouble(Lat), Double.parseDouble(Lng));
+		    			  MarkersParametre KM;
+		    			  if (IdDoce!=null)
+		    				   KM = new MarkersParametre(Double.parseDouble(Lat), Double.parseDouble(Lng),protocol+"://"+datageturl+"?"+ConstantsGeoLocal.EXTRADATA+"="+extradata);
+		    			  else
+		    				  KM = new MarkersParametre(Double.parseDouble(Lat), Double.parseDouble(Lng),"");
 				    	  Salida.add(KM);
 					} catch (Exception e) {
 						e.printStackTrace();

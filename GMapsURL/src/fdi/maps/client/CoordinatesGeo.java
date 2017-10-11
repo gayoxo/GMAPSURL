@@ -13,10 +13,12 @@ public class CoordinatesGeo implements Coordinates {
 
 	private Double Lati;
 	private Double Longi;
+	private String UrlFrame;
 	
-	public CoordinatesGeo(Double latii, Double longii) {
+	public CoordinatesGeo(Double latii, Double longii, String UrlFrame) {
 		Lati=latii;
 		Longi=longii;
+		this.UrlFrame=UrlFrame;
 	}
 
 	/* (non-Javadoc)
@@ -82,4 +84,8 @@ public class CoordinatesGeo implements Coordinates {
 		return null;
 	}
 
+	
+	public String getUrlFrame() {
+		return UrlFrame;
+	}
 }

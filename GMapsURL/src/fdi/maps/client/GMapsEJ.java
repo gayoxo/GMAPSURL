@@ -21,6 +21,7 @@ import com.google.gwt.geolocation.client.Position.Coordinates;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.maps.gwt.client.Geocoder;
@@ -28,7 +29,10 @@ import com.google.maps.gwt.client.GeocoderRequest;
 import com.google.maps.gwt.client.GeocoderResult;
 import com.google.maps.gwt.client.GeocoderStatus;
 import com.google.maps.gwt.client.GoogleMap;
+import com.google.maps.gwt.client.InfoWindow;
+import com.google.maps.gwt.client.InfoWindowOptions;
 import com.google.maps.gwt.client.GoogleMap.DblClickHandler;
+import com.google.maps.gwt.client.Marker.ClickHandler;
 import com.google.maps.gwt.client.places.Autocomplete;
 import com.google.maps.gwt.client.places.AutocompleteOptions;
 import com.google.maps.gwt.client.places.PlaceGeometry;
@@ -121,6 +125,10 @@ private String datageturl;
 					+"-"+datageturl);
 			serviceGMaps.getExtradata(extradata,datageturl,protocol,new AsyncCallback<ArrayList<MarkersParametre>>() {
 
+				
+				
+				private Coordinates P=null;
+				
 				@Override
 				public void onFailure(Throwable caught) {
 					Window.alert("Error obnteniendo los datos extra de la posicion");
@@ -135,6 +143,7 @@ private String datageturl;
 					double DLongitude;
 					ArrayList<Coordinates> Coordenadainterna=new ArrayList<Coordinates>();
 					
+					String DURL;
 					if (result.size()>1)
 					{
 					
@@ -146,7 +155,7 @@ private String datageturl;
 	
 								for (int i = 0; i < result.size(); i++) {
 									MarkersParametre markersParametreA = result.get(i);
-									Coordinates nueva=new CoordinatesGeo(markersParametreA.getLat(),markersParametreA.getLng());
+									Coordinates nueva=new CoordinatesGeo(markersParametreA.getLat(),markersParametreA.getLng(),markersParametreA.getUrlFrame());
 									Coordenadainterna.add(nueva);
 								}
 								
@@ -157,6 +166,7 @@ private String datageturl;
 										{
 										DLatitude=Coordenadainterna.get(0).getLatitude();
 										DLatitude=Coordenadainterna.get(0).getLongitude();
+										DURL=((CoordinatesGeo)Coordenadainterna.get(0)).getUrlFrame();
 										}
 
 								
@@ -177,7 +187,7 @@ private String datageturl;
 						else
 						{
 						
-						Coordinates P=null;
+						
 						
 						if (!result.isEmpty())
 						{
@@ -193,10 +203,10 @@ private String datageturl;
 							
 							DLatitude = markersParametreA.getLat();
 							DLongitude = markersParametreA.getLng();
+							DURL= markersParametreA.getUrlFrame();
 							
 							
-							
-							P= new CoordinatesGeo(DLatitude,DLongitude);
+							P= new CoordinatesGeo(DLatitude,DLongitude,DURL);
 							
 							
 						} catch (Exception e) {
@@ -245,6 +255,8 @@ private String datageturl;
 								
 
 
+								private Marker marker;
+
 								@Override
 								public void handle(JsArray<GeocoderResult> a, GeocoderStatus b) {
 									GeocoderResult result = a.shift();
@@ -254,10 +266,22 @@ private String datageturl;
 								        mOpts.setPosition(result.getGeometry().getLocation());
 								        mOpts.setIcon(MarkerImage.create(GEOICONRED));
 								        
-								        Marker marker = Marker.create(mOpts);
+								        marker = Marker.create(mOpts);
 								        marker.setTitle(result.getFormattedAddress());
 								        marker.setMap(gMap);
 								        
+								        
+								        if (P instanceof CoordinatesGeo)
+								        {
+								        	marker.addClickListener(new ClickHandler() {
+												
+												@Override
+												public void handle(MouseEvent event) {
+													drawInfoWindow(marker, event,((CoordinatesGeo) P).getUrlFrame(),gMap);
+													
+												}
+											});
+								        }
 								        
 								        if (ActualMarked!=null)
 								        {
@@ -450,6 +474,27 @@ private String datageturl;
 		}
         */
 	}
+	
+	
+	
+	
+	
+	public static void drawInfoWindow(final Marker marker, MouseEvent mouseEvent,String URL,GoogleMap gMap) {
+	    if (marker == null || mouseEvent == null) {
+	      return;
+	    }
+
+	    Frame F=new Frame(URL);
+	    
+	    
+	    InfoWindowOptions options = InfoWindowOptions.create();
+	    options.setContent(F.toString());
+
+	    InfoWindow iw = InfoWindow.create(options);
+	    iw.open(gMap, marker);
+
+
+	  }
 
 	private void processRoute() {
 		
@@ -457,22 +502,14 @@ private String datageturl;
 		
 		
 		int cc=1;
-        for (int i = 0; i < Coordenada.size(); i++) {        	 
-			Coordinates lng=Coordenada.get(i);
-			MarkerOptions mOptsT = MarkerOptions.create();
-			 mOptsT.setPosition(LatLng.create(lng.getLatitude(), lng.getLongitude()));
-			if (i==0)
-				 mOptsT.setIcon(MarkerImage.create(GEOICONRED));
-			else
-				if (i==Coordenada.size()-1)
-					 mOptsT.setIcon(MarkerImage.create(GEOICOBLUE));
-				else
-					 mOptsT.setIcon(MarkerImage.create(GEOICONYEL));
-			  Marker marker2 = Marker.create(mOptsT);
-		        marker2.setTitle(Integer.toString(cc));
-		        cc++;
-		        
-		        marker2.setMap(gMap);
+        for (int i = 0; i < Coordenada.size(); i++) { 
+        	
+        	Coordinates lng=Coordenada.get(i);
+        	
+        	new MarkerCoordGeoMap(lng,Coordenada.size()-1,gMap,cc,i);
+        	
+			cc++;
+			
 			
 		}
         
