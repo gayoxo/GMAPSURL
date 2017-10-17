@@ -81,6 +81,8 @@ private Autocomplete autoComplete;
 private static GMapsServiceAsync serviceGMaps = GWT.create(GMapsService.class);
 private String extradata;
 private String datageturl;
+private String visualdatageturl;
+private String documentid;
 	
 
 	
@@ -100,6 +102,8 @@ private String datageturl;
 		protocol = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.PROTOCOL);
 		extradata  = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.EXTRADATA);
 		datageturl = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.DATAGETURL);
+		visualdatageturl = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.VISUALDATAGETURL);
+		documentid = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.DOCUMENTID);
 		
 //		multy = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.MULTI);
 		
@@ -119,11 +123,11 @@ private String datageturl;
 			editableAction=false;
 		}
 		
-		if (extradata!=null&&datageturl!=null)
+		if (extradata!=null&&datageturl!=null&&visualdatageturl!=null&&documentid!=null)
 		{
 			GWT.log(extradata
 					+"-"+datageturl);
-			serviceGMaps.getExtradata(extradata,datageturl,protocol,new AsyncCallback<ArrayList<MarkersParametre>>() {
+			serviceGMaps.getExtradata(extradata,datageturl,protocol,visualdatageturl,documentid,new AsyncCallback<ArrayList<MarkersParametre>>() {
 
 				
 				

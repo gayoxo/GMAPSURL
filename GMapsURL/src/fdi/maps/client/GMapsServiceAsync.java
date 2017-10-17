@@ -13,5 +13,5 @@ public interface GMapsServiceAsync {
 	void greetServer(String input, AsyncCallback<String> callback)
 			throws IllegalArgumentException;
 
-	void getExtradata(String extradata, String datageturl, String protocol, AsyncCallback<ArrayList<MarkersParametre>> asyncCallback);
+	void getExtradata(String extradata, String datageturl, String protocol, String visualdatageturl, String documentid, AsyncCallback<ArrayList<MarkersParametre>> asyncCallback);
 }

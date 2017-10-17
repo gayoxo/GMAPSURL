@@ -14,5 +14,6 @@ import fdi.maps.shared.MarkersParametre;
 public interface GMapsService extends RemoteService {
 	String greetServer(String name) throws IllegalArgumentException;
 
-	ArrayList<MarkersParametre> getExtradata(String extradata, String datageturl, String protocol);
+	ArrayList<MarkersParametre> getExtradata(String extradata, String datageturl, String protocol,
+			String visualdatageturl, String documentid);
 }

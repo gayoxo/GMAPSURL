@@ -15,4 +15,7 @@ public class ConstantsGeoLocal {
 		public static final String MULTI = "multi";
 		public static final String EXTRADATA = "extradata";
 		public static final String DATAGETURL = "datageturl";
+		public static final String VISUALDATAGETURL = "visualdatageturl";
+		public static final String POSITION = "position";
+		public static final String DOCUMENTID = "documentpartid";
 }

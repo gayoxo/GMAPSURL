@@ -59,7 +59,7 @@ public class GMapsServiceImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public ArrayList<MarkersParametre> getExtradata(String extradata, String datageturl, String protocol) {
+	public ArrayList<MarkersParametre> getExtradata(String extradata, String datageturl, String protocol,String visualdatageturl, String documentid) {
 		
 
 		
@@ -105,7 +105,7 @@ public class GMapsServiceImpl extends RemoteServiceServlet implements
 		    		  try {
 		    			  MarkersParametre KM;
 		    			  if (IdDoce!=null)
-		    				   KM = new MarkersParametre(Double.parseDouble(Lat), Double.parseDouble(Lng),protocol+"://"+datageturl+"?"+ConstantsGeoLocal.EXTRADATA+"="+extradata);
+		    				   KM = new MarkersParametre(Double.parseDouble(Lat), Double.parseDouble(Lng),protocol+"://"+visualdatageturl+"?"+ConstantsGeoLocal.POSITION+"="+IdDoce+"&"+ConstantsGeoLocal.EXTRADATA+"="+extradata+"&"+ConstantsGeoLocal.DOCUMENTID+"="+documentid);
 		    			  else
 		    				  KM = new MarkersParametre(Double.parseDouble(Lat), Double.parseDouble(Lng),"");
 				    	  Salida.add(KM);
