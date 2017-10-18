@@ -513,7 +513,7 @@ private String noinfo;
         	
         	Coordinates lng=Coordenada.get(i);
         	
-        	new MarkerCoordGeoMap(lng,Coordenada.size()-1,gMap,cc,i);
+        	new MarkerCoordGeoMap(lng,Coordenada.size()-1,gMap,cc,i,noinfo);
         	
 			cc++;
 			
