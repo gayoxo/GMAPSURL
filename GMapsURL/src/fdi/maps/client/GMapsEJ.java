@@ -83,6 +83,7 @@ private String extradata;
 private String datageturl;
 private String visualdatageturl;
 private String documentid;
+private String noinfo;
 	
 
 	
@@ -104,6 +105,7 @@ private String documentid;
 		datageturl = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.DATAGETURL);
 		visualdatageturl = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.VISUALDATAGETURL);
 		documentid = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.DOCUMENTID);
+		noinfo = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.NOINFO);
 		
 //		multy = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.MULTI);
 		
@@ -281,7 +283,8 @@ private String documentid;
 												
 												@Override
 												public void handle(MouseEvent event) {
-													drawInfoWindow(marker, event,((CoordinatesGeo) P).getUrlFrame(),gMap);
+													if (noinfo==null||noinfo.isEmpty()||noinfo.equals("false"))
+														drawInfoWindow(marker, event,((CoordinatesGeo) P).getUrlFrame(),gMap);
 													
 												}
 											});

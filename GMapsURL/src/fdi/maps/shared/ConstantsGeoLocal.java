@@ -19,5 +19,5 @@ public class ConstantsGeoLocal {
 		public static final String POSITION = "position";
 		public static final String DOCUMENTID = "documentpartid";
 		public static final String EDITORNAME = "editorname";
-		
+		public static final String NOINFO = "noinfo";
 }
