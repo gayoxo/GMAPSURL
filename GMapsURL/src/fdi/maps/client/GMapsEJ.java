@@ -107,6 +107,47 @@ private String documentid;
 		
 //		multy = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.MULTI);
 		
+		
+		
+		Window.addCloseHandler( 
+        	    new CloseHandler<Window>() 
+        	    {
+        	       
+
+					public void onClose( CloseEvent<Window> windowCloseEvent ) 
+        	        {
+	
+							
+						
+        	        	 if (postUrl!=null&&!postUrl.isEmpty())
+						 {
+						
+						String URLPOSTF = protocol+"://"+postUrl+"?";
+						
+						if (ActualMarked!=null)
+							URLPOSTF = URLPOSTF+ConstantsGeoLocal.LATITUDE+"="+ActualMarked.getPosition().lat()+"&"+ConstantsGeoLocal.LONGITUDE+"="+ActualMarked.getPosition().lng();
+							
+						
+							
+						if (passId!=null&&!passId.isEmpty())
+							{
+							if (ActualMarked!=null)
+								URLPOSTF=URLPOSTF+"&";
+							URLPOSTF=URLPOSTF+ConstantsGeoLocal.PASSID+"="+passId;
+							}
+//						Window.alert(URLPOSTF);
+//						panel.setAction(URLPOSTF);
+//						panel.submit();
+						
+						doGet(URLPOSTF);
+						
+	
+						
+						 }
+        	        }
+        	    } ); 
+		
+		
 		if (protocol!=null)
 		{
 		protocol=protocol.toLowerCase();
@@ -763,43 +804,7 @@ private String documentid;
         
 
 
-        Window.addCloseHandler( 
-        	    new CloseHandler<Window>() 
-        	    {
-        	       
-
-					public void onClose( CloseEvent<Window> windowCloseEvent ) 
-        	        {
-	
-							
-						
-        	        	 if (postUrl!=null&&!postUrl.isEmpty())
-						 {
-						
-						String URLPOSTF = protocol+"://"+postUrl+"?";
-						
-						if (ActualMarked!=null)
-							URLPOSTF = URLPOSTF+ConstantsGeoLocal.LATITUDE+"="+ActualMarked.getPosition().lat()+"&"+ConstantsGeoLocal.LONGITUDE+"="+ActualMarked.getPosition().lng();
-							
-						
-							
-						if (passId!=null&&!passId.isEmpty())
-							{
-							if (ActualMarked!=null)
-								URLPOSTF=URLPOSTF+"&";
-							URLPOSTF=URLPOSTF+ConstantsGeoLocal.PASSID+"="+passId;
-							}
-//						Window.alert(URLPOSTF);
-//						panel.setAction(URLPOSTF);
-//						panel.submit();
-						
-						doGet(URLPOSTF);
-						
-	
-						
-						 }
-        	        }
-        	    } ); 
+        
         
 
         }
