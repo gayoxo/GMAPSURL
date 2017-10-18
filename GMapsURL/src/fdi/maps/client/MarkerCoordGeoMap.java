@@ -14,12 +14,11 @@ public class MarkerCoordGeoMap {
 	private Marker marker2;
 	private Coordinates lngt;
 	private GoogleMap gMapt;
-	private String Noinfo;
 
-	public MarkerCoordGeoMap(Coordinates lng, int size, GoogleMap gMap, int cc, int actual,String noinfo) {
+	public MarkerCoordGeoMap(Coordinates lng, int size, GoogleMap gMap, int cc, int actual) {
 		this.lngt=lng;
 		this.gMapt=gMap;
-		this.Noinfo=noinfo;
+
 		MarkerOptions mOptsT = MarkerOptions.create();
 		 mOptsT.setPosition(LatLng.create(lng.getLatitude(), lng.getLongitude()));
 		if (actual==0)
@@ -40,7 +39,7 @@ public class MarkerCoordGeoMap {
 					public void handle(MouseEvent event) {
 						 if (lngt instanceof CoordinatesGeo)
 					        {
-								if (Noinfo==null||Noinfo.isEmpty()||Noinfo.equals("false"))
+								if (((CoordinatesGeo) lngt).isInfo())
 									GMapsEJ.drawInfoWindow(marker2, event,((CoordinatesGeo) lngt).getUrlFrame(),gMapt);
 					        }
 						

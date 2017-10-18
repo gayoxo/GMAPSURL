@@ -83,7 +83,6 @@ private String extradata;
 private String datageturl;
 private String visualdatageturl;
 private String documentid;
-private String noinfo;
 	
 
 	
@@ -105,7 +104,6 @@ private String noinfo;
 		datageturl = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.DATAGETURL);
 		visualdatageturl = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.VISUALDATAGETURL);
 		documentid = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.DOCUMENTID);
-		noinfo = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.NOINFO);
 		
 //		multy = com.google.gwt.user.client.Window.Location.getParameter(ConstantsGeoLocal.MULTI);
 		
@@ -147,6 +145,7 @@ private String noinfo;
 					boolean multiActivado = false;
 					double DLatitude;
 					double DLongitude;
+					boolean Dinfo;
 					ArrayList<Coordinates> Coordenadainterna=new ArrayList<Coordinates>();
 					
 					String DURL;
@@ -161,7 +160,7 @@ private String noinfo;
 	
 								for (int i = 0; i < result.size(); i++) {
 									MarkersParametre markersParametreA = result.get(i);
-									Coordinates nueva=new CoordinatesGeo(markersParametreA.getLat(),markersParametreA.getLng(),markersParametreA.getUrlFrame());
+									Coordinates nueva=new CoordinatesGeo(markersParametreA.getLat(),markersParametreA.getLng(),markersParametreA.getUrlFrame(),markersParametreA.isInfo());
 									Coordenadainterna.add(nueva);
 								}
 								
@@ -210,9 +209,9 @@ private String noinfo;
 							DLatitude = markersParametreA.getLat();
 							DLongitude = markersParametreA.getLng();
 							DURL= markersParametreA.getUrlFrame();
+							Dinfo= markersParametreA.isInfo();
 							
-							
-							P= new CoordinatesGeo(DLatitude,DLongitude,DURL);
+							P= new CoordinatesGeo(DLatitude,DLongitude,DURL,Dinfo);
 							
 							
 						} catch (Exception e) {
@@ -283,7 +282,7 @@ private String noinfo;
 												
 												@Override
 												public void handle(MouseEvent event) {
-													if (noinfo==null||noinfo.isEmpty()||noinfo.equals("false"))
+//													if (noinfo==null||noinfo.isEmpty()||noinfo.equals("false"))
 														drawInfoWindow(marker, event,((CoordinatesGeo) P).getUrlFrame(),gMap);
 													
 												}
@@ -513,7 +512,7 @@ private String noinfo;
         	
         	Coordinates lng=Coordenada.get(i);
         	
-        	new MarkerCoordGeoMap(lng,Coordenada.size()-1,gMap,cc,i,noinfo);
+        	new MarkerCoordGeoMap(lng,Coordenada.size()-1,gMap,cc,i);
         	
 			cc++;
 			
@@ -781,6 +780,7 @@ private String noinfo;
 						
 						if (ActualMarked!=null)
 							URLPOSTF = URLPOSTF+ConstantsGeoLocal.LATITUDE+"="+ActualMarked.getPosition().lat()+"&"+ConstantsGeoLocal.LONGITUDE+"="+ActualMarked.getPosition().lng();
+							
 						
 							
 						if (passId!=null&&!passId.isEmpty())

@@ -21,7 +21,7 @@ public class MarkersParametre implements Serializable,IsSerializable{
 	private Double lat;
 	private Double lng;
 	private String urlFrame;
-
+	private boolean info;
 	
 	
 	public MarkersParametre() {
@@ -30,11 +30,12 @@ public class MarkersParametre implements Serializable,IsSerializable{
 
 
 
-	public MarkersParametre(Double lat, Double lng, String UrlFrame) {
+	public MarkersParametre(Double lat, Double lng, String UrlFrame,boolean info) {
 		super();
 		this.lat = lat;
 		this.lng = lng;
 		this.urlFrame=UrlFrame;
+		this.info=info;
 	}
 
 
@@ -50,5 +51,13 @@ public class MarkersParametre implements Serializable,IsSerializable{
 	
 	public String getUrlFrame() {
 		return urlFrame;
+	}
+	
+	public boolean isInfo() {
+		return info;
+	}
+	
+	public void setInfo(boolean info) {
+		this.info = info;
 	}
 }

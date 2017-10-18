@@ -14,11 +14,13 @@ public class CoordinatesGeo implements Coordinates {
 	private Double Lati;
 	private Double Longi;
 	private String UrlFrame;
+	private boolean info;
 	
-	public CoordinatesGeo(Double latii, Double longii, String UrlFrame) {
+	public CoordinatesGeo(Double latii, Double longii, String UrlFrame,boolean info) {
 		Lati=latii;
 		Longi=longii;
 		this.UrlFrame=UrlFrame;
+		this.info=info;
 	}
 
 	/* (non-Javadoc)
@@ -87,5 +89,13 @@ public class CoordinatesGeo implements Coordinates {
 	
 	public String getUrlFrame() {
 		return UrlFrame;
+	}
+	
+	public boolean isInfo() {
+		return info;
+	}
+	
+	public void setInfo(boolean info) {
+		this.info = info;
 	}
 }

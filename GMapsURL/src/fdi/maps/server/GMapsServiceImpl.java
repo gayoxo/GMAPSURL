@@ -100,14 +100,26 @@ public class GMapsServiceImpl extends RemoteServiceServlet implements
 		    	  
 		    	  String Lat=hashMap.get(ConstantsGeoLocal.LATITUDE);
 		    	  String Lng=hashMap.get(ConstantsGeoLocal.LONGITUDE);
+		    	  String Snoinfo=hashMap.get(ConstantsGeoLocal.NOINFO);
+		    	  
+		    	  boolean noinfo=false;
+		    	  
+		    	  try {
+					noinfo=Boolean.parseBoolean(Snoinfo);
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+		    	
+		    	  
+		    	  
 		    	  if (Lat!=null&&!Lat.isEmpty()&&Lng!=null&&!Lng.isEmpty())
 		    	  {
 		    		  try {
 		    			  MarkersParametre KM;
 		    			  if (IdDoce!=null)
-		    				   KM = new MarkersParametre(Double.parseDouble(Lat), Double.parseDouble(Lng),protocol+"://"+visualdatageturl+"?"+ConstantsGeoLocal.POSITION+"="+IdDoce+"&"+ConstantsGeoLocal.EDITORNAME+"="+ConstantsGeoLocal.GEOLOCALIZATION+"&"+ConstantsGeoLocal.DOCUMENTID+"="+documentid);
+		    				   KM = new MarkersParametre(Double.parseDouble(Lat), Double.parseDouble(Lng),protocol+"://"+visualdatageturl+"?"+ConstantsGeoLocal.POSITION+"="+IdDoce+"&"+ConstantsGeoLocal.EDITORNAME+"="+ConstantsGeoLocal.GEOLOCALIZATION+"&"+ConstantsGeoLocal.DOCUMENTID+"="+documentid,!noinfo);
 		    			  else
-		    				  KM = new MarkersParametre(Double.parseDouble(Lat), Double.parseDouble(Lng),"");
+		    				  KM = new MarkersParametre(Double.parseDouble(Lat), Double.parseDouble(Lng),"",!noinfo);
 				    	  Salida.add(KM);
 					} catch (Exception e) {
 						e.printStackTrace();
