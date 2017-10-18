@@ -105,7 +105,7 @@ public class GMapsServiceImpl extends RemoteServiceServlet implements
 		    		  try {
 		    			  MarkersParametre KM;
 		    			  if (IdDoce!=null)
-		    				   KM = new MarkersParametre(Double.parseDouble(Lat), Double.parseDouble(Lng),protocol+"://"+visualdatageturl+"?"+ConstantsGeoLocal.POSITION+"="+IdDoce+"&"+ConstantsGeoLocal.EXTRADATA+"="+extradata+"&"+ConstantsGeoLocal.DOCUMENTID+"="+documentid);
+		    				   KM = new MarkersParametre(Double.parseDouble(Lat), Double.parseDouble(Lng),protocol+"://"+visualdatageturl+"?"+ConstantsGeoLocal.POSITION+"="+IdDoce+"&"+ConstantsGeoLocal.EDITORNAME+"="+ConstantsGeoLocal.GEOLOCALIZATION+"&"+ConstantsGeoLocal.DOCUMENTID+"="+documentid);
 		    			  else
 		    				  KM = new MarkersParametre(Double.parseDouble(Lat), Double.parseDouble(Lng),"");
 				    	  Salida.add(KM);
